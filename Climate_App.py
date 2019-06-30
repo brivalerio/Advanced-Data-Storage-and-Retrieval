@@ -22,9 +22,6 @@ Station = Base.classes.station
 # Create our session (link) from Python to the DB
 session = Session(engine)
 
-# Finding last date in dataset for use later
-# last_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()
-
 # Flask
 app = Flask(__name__)
 
@@ -68,7 +65,20 @@ def precipitation():
         
     return jsonify(precip_total)
 
+@app.route("/api/v1.0/stations")
+def stations():
+    stations = session.query(Station.station, Station.name).\
+        join(Measurement, Station.station == Measurement.station).\
+        filter(Measurement.date >= '2016-04-01').\
+        filter(Measurement.date <= '2017-03-31').\
+        group_by(Station.station).all()
+    
+    station_list = []
+    for s in stations:
+        row = {"Station ID":s[0], "Station Name":s[1]}
+        station_list.append(row)
 
+    return jsonify(station_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
