@@ -59,8 +59,8 @@ def precipitation():
         filter(Measurement.date <= '2017-03-31').order_by(Measurement.date).all()
 
     precip_total = []
-    for x in precip:
-        row = {"Date":x[0], "Precipitation":x[1]}
+    for p in precip:
+        row = {"Date":p[0], "Precipitation":p[1]}
         precip_total.append(row)
         
     return jsonify(precip_total)
@@ -69,8 +69,7 @@ def precipitation():
 def stations():
     stations = session.query(Station.station, Station.name).\
         join(Measurement, Station.station == Measurement.station).\
-        filter(Measurement.date >= '2016-04-01').\
-        filter(Measurement.date <= '2017-03-31').\
+        filter(Measurement.date >= '2016-04-01').filter(Measurement.date <= '2017-03-31').\
         group_by(Station.station).all()
     
     station_list = []
@@ -79,6 +78,19 @@ def stations():
         station_list.append(row)
 
     return jsonify(station_list)
+
+@app.route("/api/v1.0/tobs")
+def tobs():
+    tobs = session.query(Measurement.date, Measurement.tobs).\
+        filter(Measurement.date >= '2016-04-01').\
+        filter(Measurement.date <= '2017-03-31').all()
+
+    tobs_list = []
+    for t in tobs:
+        row = {"Date":t[0], "Temperature Observations (tobs)":t[1]}
+        tobs_list.append(row)
+    
+    return jsonify(tobs_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
