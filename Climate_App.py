@@ -109,12 +109,19 @@ def tobs():
 
 @app.route("/api/v1.0/<start>")
 def start_only(start):
-    t_calc = calc_temps(start, '2017-08-23')
+    so_calc = calc_temps(start, '2017-08-23')
+    for so in so_calc:
+        row = {"TMIN":so_calc[0][0], "TAVG":so_calc[0][1], "TMAX":so_calc[0][2]}
+    
+    return jsonify(row)
 
-    for t_c in t_calc:
-        row = {"TMIN":t_calc[0][0], "TAVG":t_calc[0][1], "TMAX":t_calc[0][2]}
+@app.route("/api/v1.0/<start>/<end>")
+def start_end(start,end):
+    se_calc = calc_temps(start, end)
+    for se in se_calc:
+        row = {"TMIN":se_calc[0][0], "TAVG":se_calc[0][1], "TMAX":se_calc[0][2]}
     
     return jsonify(row)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
